@@ -25,14 +25,11 @@
           <tr>
             <td><%= url %></td>
             <td><%= urls[url] %></td>
-            <td><form method="POST" action="/urls/url/delete"></form>
-                <button type="delete" class="btn btn-primary">Delete</button>
+            <td><form method="post" action="/urls/<%= url %>/delete">
+                <button type="submit" class="btn btn-outline-danger">Delete</button>
             </form></td>
           </tr>
         <% } %>
-        <!-- <form method="POST" action="/urls/b2xVn2/delete"></form> -->
-        <!-- <form method="POST" action="/urls/9sm5xK/delete"></form> -->
-        <!-- <form class="form-inline" action="/urls" method="POST"></form> -->
       </tbody>
     </table>
     <a href='#' >A link for shortening a new URL. This will be a dead link for </a>

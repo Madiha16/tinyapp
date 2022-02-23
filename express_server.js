@@ -44,14 +44,6 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-// Page to display a single URL and its shortened form
-// if the ID of the long url was b2xVn2, then the url would look like /urls/b2xVn2 in the browser
-// Further, the value of req.params.shortURL would be b2xVn2
-app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
-  res.render("urls_show", templateVars);
-});
-
 // Redirect any request to "/u/:shortURL" to its longURL
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
@@ -61,19 +53,49 @@ app.get("/u/:shortURL", (req, res) => {
     res.send("This URL does not exist.");
   }
   res.redirect(longURL);
-
+  
 });
 
 
 //---------------------------------------------- POST ROUTES -----------------------------------------------
 // POST route to handle the form submission (make a request to POST /urls)
 // body will contain one URL-encoded name-value pair with the name longURL.
+// The form has an action attribute set to /urls
+// The form's method is set to POST
+// The form has one named input, with the name attribute set to longURL
+// Note that it's been parsed into a JS object, where "longURL" is the key
+// we specified this key using the "input" attribute "name"
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
+  // console.log(req.body);  // Log the POST request body to the console
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
-  console.log("shortURL::", shortURL, "req.body.longURL::", req.body.longURL);  // Log the POST request body to the console
+  // console.log("shortURL::", shortURL, "req.body.longURL::", req.body.longURL);  // Log the POST request body to the console
   res.redirect(`/urls/${shortURL}`);
+});
+
+// Add a POST route that removes a URL resource: POST /urls/:shortURL/delete
+// After the resource has been deleted, redirect the client back to the urls_index page ("/urls").
+app.post("/urls/:shortURL/delete", (req, res) => {
+  const shortURL = req.params.shortURL;
+  delete urlDatabase[shortURL];
+  res.redirect("/urls");
+});
+
+
+
+
+// Page to display a single URL and its shortened form
+// if the ID of the long url was b2xVn2, then the url would look like /urls/b2xVn2 in the browser
+// Further, the value of req.params.shortURL would be b2xVn2
+
+// The order of route definitions matters! The GET /urls/new route needs to be defined before the
+// GET /urls/:id route. Routes defined earlier will take precedence, so if we place this route after
+// the /urls/:id definition, any calls to /urls/new will be handled by app.get("/urls/:id", ...)
+// because Express will think that new is a route parameter. A good rule of thumb to follow is that routes
+// should be ordered from most specific to least specific.
+app.get("/urls/:shortURL", (req, res) => {
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  res.render("urls_show", templateVars);
 });
 
 //---------------------------------------------- LISTENER -------------------------------------------------
