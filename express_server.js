@@ -7,17 +7,25 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.set("view engine", "ejs");
 
-//--------------------------------------------- DATABASE-------------------------------------------------
+//--------------------------------------------- DATABASE -------------------------------------------------
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
+//-------------------------------------------- HELPER FUNCTION ---------------------------------------------
+const generateRandomString = function() {
+  return Math.random().toString(36).substr(2, 6);
+};
+console.log(generateRandomString());
+
 //--------------------------------------------- GET ROUTES -------------------------------------------------
+// Homepage
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+// URLS index
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
@@ -31,22 +39,29 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+// GET route to render the urls_new.ejs template in the browser, to present the form to the user
+// This route handler will render the page with the form.
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-//--------------------------------------------- urls/:shortURL ------------------------------------------------
+// Page to display a single URL and its shortened form
+// if the ID of the long url was b2xVn2, then the url would look like /urls/b2xVn2 in the browser
+// Further, the value of req.params.shortURL would be b2xVn2
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_show", templateVars);
 });
 
+//---------------------------------------------- POST ROUTES -----------------------------------------------
+// POST route to handle the form submission (make a request to POST /urls)
+// body will contain one URL-encoded name-value pair with the name longURL.
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
   res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
 
-//----------------------------------------------- LISTENER -------------------------------------------------
+//---------------------------------------------- LISTENER -------------------------------------------------
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
