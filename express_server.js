@@ -17,7 +17,6 @@ const urlDatabase = {
 const generateRandomString = function() {
   return Math.random().toString(36).substr(2, 6);
 };
-console.log(generateRandomString());
 
 //--------------------------------------------- GET ROUTES -------------------------------------------------
 // Homepage
@@ -58,7 +57,10 @@ app.get("/urls/:shortURL", (req, res) => {
 // body will contain one URL-encoded name-value pair with the name longURL.
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = req.body.longURL;
+  console.log("shortURL::", shortURL, "req.body.longURL::", req.body.longURL);  // Log the POST request body to the console
+  res.redirect(`/urls/${shortURL}`);
 });
 
 //---------------------------------------------- LISTENER -------------------------------------------------
