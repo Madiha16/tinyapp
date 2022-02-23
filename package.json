@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Madiha16/tinyapp#readme",
   "dependencies": {
+    "ejs": "^3.1.6",
     "express": "^4.17.3"
   }
 }
