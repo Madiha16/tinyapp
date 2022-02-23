@@ -52,6 +52,19 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+// Redirect any request to "/u/:shortURL" to its longURL
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL];
+  // URL Shortening (Part 2)
+  // What would happen if a client requests a non-existent shortURL?
+  if (!urlDatabase[req.params.shortURL]) {
+    res.send("This URL does not exist.");
+  }
+  res.redirect(longURL);
+
+});
+
+
 //---------------------------------------------- POST ROUTES -----------------------------------------------
 // POST route to handle the form submission (make a request to POST /urls)
 // body will contain one URL-encoded name-value pair with the name longURL.
