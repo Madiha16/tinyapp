@@ -53,7 +53,7 @@ app.get("/u/:shortURL", (req, res) => {
     res.send("This URL does not exist.");
   }
   res.redirect(longURL);
-  
+
 });
 
 
@@ -81,13 +81,16 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect("/urls");
 });
 
-
-
+// Add a POST route that updates a URL resource; POST /urls/:id
+app.post("/urls/:shortURL/", (req, res) => {
+  const shortURL = req.params.shortURL;
+  res.redirect(`/urls/${shortURL}`);
+});
 
 // Page to display a single URL and its shortened form
 // if the ID of the long url was b2xVn2, then the url would look like /urls/b2xVn2 in the browser
 // Further, the value of req.params.shortURL would be b2xVn2
-
+//
 // The order of route definitions matters! The GET /urls/new route needs to be defined before the
 // GET /urls/:id route. Routes defined earlier will take precedence, so if we place this route after
 // the /urls/:id definition, any calls to /urls/new will be handled by app.get("/urls/:id", ...)
