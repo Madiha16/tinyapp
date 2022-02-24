@@ -9,12 +9,12 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
 
+        
         <form class="form-inline" action="/login" method="POST">
-          <div class="form-group mb-2">
-            <label for="username">Enter Username:</label>
+          <label style="margin-right: 20px" for="username"><%= username %> </label>
+            <label for="username">Login</label><div class=""></div>
             <input class="form-control" type="text" name="username" placeholder="Username" style="width: 300px; margin: 1em">
             <button type="submit" class="btn btn-primary">Login</button>
-          </div>
         </form>
 
       </div>
