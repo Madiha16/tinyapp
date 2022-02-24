@@ -103,6 +103,14 @@ app.post("/login", (req, res) => {
   res.redirect("/urls/");
 });
 
+// Implement the /logout endpoint so that it clears the username cookie
+// and redirects the user back to the /urls page.
+app.post("/logout", (req, res) => {
+  const username = req.body.username;
+  res.clearCookie("username", username);
+  res.redirect("/urls/");
+});
+
 // Page to display a single URL and its shortened form
 // if the ID of the long url was b2xVn2, then the url would look like /urls/b2xVn2 in the browser
 // Further, the value of req.params.shortURL would be b2xVn2
