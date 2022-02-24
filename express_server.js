@@ -143,20 +143,27 @@ app.post("/logout", (req, res) => {
 
 // This endpoint should add a new user object to the global users object.
 // The user object should include the user's id, email and password, similar to the example above.
-
-// To generate a random user ID, use the same function you use to generate random IDs for URLs.
-
 // After adding the user, set a user_id cookie containing the user's newly generated ID.
-
 // Redirect the user to the /urls page.
 // Test that the users object is properly being appended to.
-// You can insert a console.log or debugger prior to the redirect logic to inspect what data the object contains.
-// Also test that the user_id cookie is being set correctly upon redirection. You already did this sort
-// of testing in the Cookies in Express activity. Use the same approach here.
+// Also test that the user_id cookie is being set correctly upon redirection.
+
+// If the e-mail or password are empty strings, send back a response with the 400 status code.
+// If someone tries to register with an email that is already in the users object, send back a
+// response with the 400 status code.
+
+// Checking for an email in the users object is something we'll need to do
+// in other routes as well. Consider creating an email lookup helper function to keep your code DRY
+
 app.post("/register", (req, res) => {
   const id = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
+
+  if (!email || !password) {
+    return res.status(400).send("ERROR: Missing email and/or password");
+  }
+
   const user = {
     id,
     email,
