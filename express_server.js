@@ -153,6 +153,7 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   
+  // check for missing email or password
   if (!email || !password) {
     return res.status(400).send("ERROR: Missing login information!");
     // include link to go back?
@@ -184,12 +185,14 @@ app.post("/login", (req, res) => {
   res.redirect("/urls/");
 });
 
-// Implement the /logout endpoint so that it clears the username cookie
+// Modify the logout endpoint to clear the correct user_id cookie instead of the username one.
 // and redirects the user back to the /urls page.
+// mentor suggested to redirect to /login... makes sense
 app.post("/logout", (req, res) => {
-  const username = req.body.username;
-  res.clearCookie("username", username);
-  res.redirect("/urls/");
+  res.clearCookie("user_id");
+  // only have to pass in the string of the key name, not the value!
+  // mentor suggested to redirect to /login... makes sense
+  res.redirect("/login");
 });
 
 // This endpoint should add a new user object to the global users object.
