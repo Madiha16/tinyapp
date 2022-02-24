@@ -29,8 +29,19 @@ const users = {
 };
 
 //-------------------------------------------- HELPER FUNCTION ---------------------------------------------
+// Helper func to generate a random string
 const generateRandomString = function() {
   return Math.random().toString(36).substr(2, 6);
+};
+
+// Helper func to check if email is in "users" database
+const getUserByEmail = function(email) {
+  for (const user in users) {
+    if (email === users[user].email) {
+      return user;
+    }
+  }
+  return false;
 };
 
 //--------------------------------------------- GET ROUTES -------------------------------------------------
@@ -134,9 +145,53 @@ app.post("/urls/:shortURL/", (req, res) => {
 // Add an endpoint to handle a POST to /login in your Express server.
 // It should set a cookie named username to the value submitted in the request body via the login form.
 // After our server has set the cookie it should redirect the browser back to the /urls page.
+//
+// Update the POST /login endpoint to look up the email address (submitted via the login form) in
+// the user object.
 app.post("/login", (req, res) => {
-  const username = req.body.username;
-  res.cookie("username", username);
+  // const username = req.body.username;
+  const email = req.body.email;
+  const password = req.body.password;
+
+  // 1. If a user with that e-mail cannot be found, return a response with a 403 status code.
+  //
+  // if getUserByEmail returns false, that means email IS NOT in "users" database
+  if (!getUserByEmail(email)) {
+    return res.status(403).send("This email is not registered");
+    // include link to go back? try again?
+  }
+
+  // set user to return value of check email function
+  const user = getUserByEmail(email);
+
+  // 2. If a user with that e-mail address is located, compare the password given in the form with
+  // the existing user's password. If it does not match, return a response with a 403 status code.
+  if (password !== users[user].password) {
+    return res.status(403).send("Invalid login credentials");
+    // include link to go back? try again?
+  }
+
+  // 3. If both checks pass, set the user_id cookie with the matching user's random ID, then redirect to /urls.
+
+
+  if (!email || !password) {
+    return res.status(400).send("ERROR: Missing email and/or password");
+    // include link to go back?
+  }
+
+  // Checking for an email in the users object is something we'll need to do
+  // in other routes as well. Consider creating an email lookup helper function to keep your code DRY
+
+  // if checkEail is true, means the email exists in users -> don't allow registration
+  if (getUserByEmail(email)) {
+    return res.status(400).send("Email is already registered");
+    // include link to go back and try again, or to go to log in page??
+  }
+
+
+
+
+  res.cookie("user_id", user.id); // ????????????
   res.redirect("/urls/");
 });
 
@@ -147,16 +202,6 @@ app.post("/logout", (req, res) => {
   res.clearCookie("username", username);
   res.redirect("/urls/");
 });
-
-// HELPER FUNCTION TO CHECK IF EMAIL IS IN USERS DB
-const checkEmail = function(email) {
-  for (const user in users) {
-    if (email === users[user].email) {
-      return true;
-    }
-  }
-  return false;
-};
 
 // This endpoint should add a new user object to the global users object.
 // The user object should include the user's id, email and password, similar to the example above.
@@ -182,7 +227,7 @@ app.post("/register", (req, res) => {
   // in other routes as well. Consider creating an email lookup helper function to keep your code DRY
 
   // if checkEail is true, means the email exists in users -> don't allow registration
-  if (checkEmail(email)) {
+  if (getUserByEmail(email)) {
     return res.status(400).send("Email is already registered");
     // include link to go back and try again, or to go to log in page??
   }
