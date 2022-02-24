@@ -93,6 +93,13 @@ app.get("/register", (req, res) => {
   res.render("register", templateVars);
 });
 
+// Create a GET /login endpoint that responds with the new login form template
+app.get("/login", (req, res) => {
+  const templateVars = {
+    email: req.body.email,
+    password: req.body.password };
+  res.render("login", templateVars);
+});
 
 //---------------------------------------------- POST ROUTES -----------------------------------------------
 // POST route to handle the form submission (make a request to POST /urls)
@@ -141,7 +148,7 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls/");
 });
 
-//------------------------- HELPER FUNCTION TO CHECK IF EMAIL IS IN USERS DB -----------------------------
+// HELPER FUNCTION TO CHECK IF EMAIL IS IN USERS DB
 const checkEmail = function(email) {
   for (const user in users) {
     if (email === users[user].email) {
