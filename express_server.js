@@ -63,6 +63,14 @@ app.get("/u/:shortURL", (req, res) => {
 
 });
 
+// Create a GET /register endpoint, which returns the register template
+app.get("/register", (req, res) => {
+  const templateVars = {
+    email: req.body.email,
+    password: req.body.password };
+  res.render("register", templateVars);
+});
+
 
 //---------------------------------------------- POST ROUTES -----------------------------------------------
 // POST route to handle the form submission (make a request to POST /urls)
