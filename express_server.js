@@ -58,7 +58,6 @@ app.get("/urls", (req, res) => {
   const user = users[req.cookies.user_id];
 
   const templateVars = {
-    // username: req.cookies["username"],
     user,
     urls: urlDatabase };
   res.render("urls_index", templateVars);
@@ -98,9 +97,8 @@ app.get("/u/:shortURL", (req, res) => {
 
 // Create a GET /register endpoint, which returns the register template
 app.get("/register", (req, res) => {
-  const templateVars = {
-    email: req.body.email,
-    password: req.body.password };
+  const user = users[req.cookies.user_id];
+  const templateVars = { user };
   res.render("register", templateVars);
 });
 
@@ -143,13 +141,11 @@ app.post("/urls/:shortURL/", (req, res) => {
 });
 
 // Add an endpoint to handle a POST to /login in your Express server.
-// It should set a cookie named username to the value submitted in the request body via the login form.
 // After our server has set the cookie it should redirect the browser back to the /urls page.
 //
 // Update the POST /login endpoint to look up the email address (submitted via the login form) in
 // the user object.
 app.post("/login", (req, res) => {
-  // const username = req.body.username;
   const email = req.body.email;
   const password = req.body.password;
   
@@ -224,14 +220,13 @@ app.post("/register", (req, res) => {
     // include link to go back and try again, or to go to log in page??
   }
 
-  const user = {
+  users[id] = {
     id,
     email,
     password
   };
-  users[id] = user;
 
-  res.cookie("user_id", user.id);
+  res.cookie("user_id", id);
 
   console.log("users:", users);
   
