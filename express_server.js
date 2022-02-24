@@ -3,7 +3,9 @@ const app = express();
 const PORT = 8080; // default port 8080
 
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
 
 app.set("view engine", "ejs");
 
@@ -85,6 +87,15 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls/:shortURL/", (req, res) => {
   const shortURL = req.params.shortURL;
   res.redirect(`/urls/${shortURL}`);
+});
+
+// Add an endpoint to handle a POST to /login in your Express server.
+// It should set a cookie named username to the value submitted in the request body via the login form.
+// After our server has set the cookie it should redirect the browser back to the /urls page.
+app.post("/login", (req, res) => {
+  const username = req.body.username;
+  res.cookie("username", username);
+  res.redirect("/urls/");
 });
 
 // Page to display a single URL and its shortened form
