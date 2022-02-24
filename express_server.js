@@ -104,9 +104,8 @@ app.get("/register", (req, res) => {
 
 // Create a GET /login endpoint that responds with the new login form template
 app.get("/login", (req, res) => {
-  const templateVars = {
-    email: req.body.email,
-    password: req.body.password };
+  const user = users[req.cookies.user_id];
+  const templateVars = { user };
   res.render("login", templateVars);
 });
 
