@@ -41,8 +41,14 @@ app.get("/", (req, res) => {
 
 // URLS index
 app.get("/urls", (req, res) => {
+  // console.log("req.cookies.user_id:", req.cookies.user_id); // req.cookies.user_id = nk8gkb
+  // console.log("req.cookies >>>>", req.cookie); // req.cookies = undefined
+
+  const user = users[req.cookies.user_id];
+
   const templateVars = {
-    username: req.cookies["username"],
+    // username: req.cookies["username"],
+    user,
     urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
@@ -58,8 +64,11 @@ app.get("/hello", (req, res) => {
 // GET route to render the urls_new.ejs template in the browser, to present the form to the user
 // This route handler will render the page with the form.
 app.get("/urls/new", (req, res) => {
+
+  const user = users[req.cookies.user_id];
+
   const templateVars = {
-    username: req.cookies["username"],
+    user,
     urls: urlDatabase };
   res.render("urls_new", templateVars);
 });
@@ -156,8 +165,9 @@ app.post("/register", (req, res) => {
   users[id] = user;
 
   res.cookie("user_id", user.id);
-  // console.log("user:", user, "users[id]:", users[id]);
-  // console.log("users:", users);
+
+  console.log("users:", users);
+  
   res.redirect("/urls/");
 });
 
@@ -172,8 +182,11 @@ app.post("/register", (req, res) => {
 // because Express will think that new is a route parameter. A good rule of thumb to follow is that routes
 // should be ordered from most specific to least specific.
 app.get("/urls/:shortURL", (req, res) => {
+
+  const user = users[req.cookies.user_id];
+
   const templateVars = {
-    username: req.cookies["username"],
+    user,
     urls: urlDatabase,
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL] };
