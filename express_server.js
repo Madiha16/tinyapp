@@ -38,7 +38,7 @@ const generateRandomString = function() {
 const getUserByEmail = function(email) {
   for (const user in users) {
     if (email === users[user].email) {
-      return user;
+      return users[user];
     }
   }
   return false;
@@ -152,46 +152,35 @@ app.post("/login", (req, res) => {
   // const username = req.body.username;
   const email = req.body.email;
   const password = req.body.password;
+  
+  if (!email || !password) {
+    return res.status(400).send("ERROR: Missing login information!");
+    // include link to go back?
+  }
+  
+  // set user to return value of check email function
+  const user = getUserByEmail(email);
+  // console.log("user:", user, "user.password::", user.password);
+  // user: { id: 'aa', email: 'a@a', password: 'a' } user.password:: a
 
   // 1. If a user with that e-mail cannot be found, return a response with a 403 status code.
   //
   // if getUserByEmail returns false, that means email IS NOT in "users" database
-  if (!getUserByEmail(email)) {
+  if (!user) {
     return res.status(403).send("This email is not registered");
     // include link to go back? try again?
   }
 
-  // set user to return value of check email function
-  const user = getUserByEmail(email);
-
   // 2. If a user with that e-mail address is located, compare the password given in the form with
   // the existing user's password. If it does not match, return a response with a 403 status code.
-  if (password !== users[user].password) {
+  if (password !== user.password) {
     return res.status(403).send("Invalid login credentials");
     // include link to go back? try again?
   }
 
-  // 3. If both checks pass, set the user_id cookie with the matching user's random ID, then redirect to /urls.
-
-
-  if (!email || !password) {
-    return res.status(400).send("ERROR: Missing email and/or password");
-    // include link to go back?
-  }
-
-  // Checking for an email in the users object is something we'll need to do
-  // in other routes as well. Consider creating an email lookup helper function to keep your code DRY
-
-  // if checkEail is true, means the email exists in users -> don't allow registration
-  if (getUserByEmail(email)) {
-    return res.status(400).send("Email is already registered");
-    // include link to go back and try again, or to go to log in page??
-  }
-
-
-
-
-  res.cookie("user_id", user.id); // ????????????
+  // 3. If both checks pass, set the user_id cookie with the matching user's random ID
+  // then redirect to /urls.
+  res.cookie("user_id", user.id);
   res.redirect("/urls/");
 });
 
