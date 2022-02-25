@@ -64,7 +64,15 @@ const urlsForUser = function(id, urlDatabase) {
 //--------------------------------------------- GET ROUTES -------------------------------------------------
 // Homepage
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  const userId = req.session.user_id;
+  const user = users[userId];
+  // if user is not logged in: (Minor) redirect to /login
+  if (!user) {
+    return res.redirect("/login");
+  }
+
+  res.redirect("/urls");
+  
 });
 
 // URLS index
