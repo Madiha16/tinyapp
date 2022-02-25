@@ -286,12 +286,15 @@ app.post("/register", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
 
   const user = users[req.cookies.user_id];
+  const shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL].longURL;
 
   const templateVars = {
     user,
-    urls: urlDatabase,
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL] };
+    shortURL,
+    longURL
+  };
+  
   res.render("urls_show", templateVars);
 });
 
