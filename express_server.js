@@ -4,6 +4,7 @@ const PORT = 8080; // default port 8080
 
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
@@ -40,18 +41,16 @@ const users = {
 
 //-------------------------------------------- HELPER FUNCTION ---------------------------------------------
 // Helper func to generate a random string
-const generateRandomString = function() {
-  return Math.random().toString(36).substr(2, 6);
-};
+const generateRandomString = () => Math.random().toString(36).substr(2, 6);
 
 // Helper func to check if email is in "users" database
-const getUserByEmail = function(email) {
+const getUserByEmail = function(email, users) {
   for (const user in users) {
     if (email === users[user].email) {
       return users[user];
     }
   }
-  return false;
+  return null;
 };
 
 const urlsForUser = function(id, urlDatabase) {
@@ -232,7 +231,7 @@ app.post("/login", (req, res) => {
   }
   
   // set user to return value of check email function
-  const user = getUserByEmail(email);
+  const user = getUserByEmail(email, users);
   // console.log("user:", user, "user.password::", user.password);
   // user: { id: 'aa', email: 'a@a', password: 'a' } user.password:: a
 
@@ -291,7 +290,7 @@ app.post("/register", (req, res) => {
   // in other routes as well. Consider creating an email lookup helper function to keep your code DRY
 
   // if checkEail is true, means the email exists in users -> don't allow registration
-  if (getUserByEmail(email)) {
+  if (getUserByEmail(email, users)) {
     return res.status(400).send("Email is already registered");
     // include link to go back and try again, or to go to log in page??
   }
