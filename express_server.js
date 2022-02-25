@@ -79,9 +79,9 @@ app.get("/", (req, res) => {
 // URLS index
 app.get("/urls", (req, res) => {
 
-  // const user = users[req.cookies.user_id];
+  // const user = users[req.session.user_id];
   // same as:
-  const userId = req.cookies.user_id;
+  const userId = req.session.user_id;
   const user = users[userId];
   const urls = urlsForUser(userId, urlDatabase);
   // console.log("urls:", urls);
@@ -114,7 +114,7 @@ app.get("/hello", (req, res) => {
 // This route handler will render the page with the form.
 app.get("/urls/new", (req, res) => {
 
-  const user = users[req.cookies.user_id];
+  const user = users[req.session.user_id];
 
   // If someone is not logged in when trying to access /urls/new , redirect them to the login page.
   if (!user) {
@@ -143,14 +143,14 @@ app.get("/u/:shortURL", (req, res) => {
 
 // Create a GET /register endpoint, which returns the register template
 app.get("/register", (req, res) => {
-  const user = users[req.cookies.user_id];
+  const user = users[req.session.user_id];
   const templateVars = { user };
   res.render("register", templateVars);
 });
 
 // Create a GET /login endpoint that responds with the new login form template
 app.get("/login", (req, res) => {
-  const user = users[req.cookies.user_id];
+  const user = users[req.session.user_id];
   const templateVars = { user };
   res.render("login", templateVars);
 });
@@ -166,7 +166,7 @@ app.get("/login", (req, res) => {
 app.post("/urls", (req, res) => {
 
   // cookie lives in browser, use it to check if a user is logged in
-  const user = users[req.cookies.user_id];
+  const user = users[req.session.user_id];
 
   // Ensure that a none logged in user cannot add a new url with a POST request to /urls.
   // The app should return a relevant error message instead.
@@ -182,11 +182,11 @@ app.post("/urls", (req, res) => {
 
   // const userURL = {
   //   longURL: req.body.longURL,
-  //   userID: req.cookies.user_id
+  //   userID: req.session.user_id
   // };
   // urlDatabase[shortURL] = userURL;
   // same thing as:
-  urlDatabase[shortURL] = {longURL, userID: req.cookies.user_id};
+  urlDatabase[shortURL] = { longURL, userID: req.session.user_id };
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -195,7 +195,7 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
 
-  const userId = req.cookies.user_id;
+  const userId = req.session.user_id;
   const user = users[userId];
 
   if (userId !== urlDatabase[shortURL].userID) {
@@ -213,7 +213,7 @@ app.post("/urls/:shortURL/", (req, res) => {
   const shortURL = req.params.shortURL;
   res.redirect(`/urls/${shortURL}`);
 
-  const userId = req.cookies.user_id;
+  const userId = req.session.user_id;
   const user = users[userId];
 
   if (userId !== urlDatabase[shortURL].userID) {
@@ -261,7 +261,8 @@ app.post("/login", (req, res) => {
 
   // 3. If both checks pass, set the user_id cookie with the matching user's random ID
   // then redirect to /urls.
-  res.cookie("user_id", user.id);
+  // res.cookie("user_id", user.id);
+  req.session.user_id = user.id;
   res.redirect("/urls/");
 });
 
@@ -313,7 +314,8 @@ app.post("/register", (req, res) => {
     password: hashedPassword
   };
 
-  res.cookie("user_id", id);
+  // res.cookie("user_id", id);
+  req.session.user_id = id;
 
   console.log("users:", users);
   
@@ -332,7 +334,7 @@ app.post("/register", (req, res) => {
 // should be ordered from most specific to least specific.
 app.get("/urls/:shortURL", (req, res) => {
 
-  const userId = req.cookies.user_id;
+  const userId = req.session.user_id;
   const user = users[userId];
 
   // urls/:id page should display a message or prompt if the user is not logged in
