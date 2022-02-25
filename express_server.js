@@ -196,6 +196,14 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls/:shortURL/", (req, res) => {
   const shortURL = req.params.shortURL;
   res.redirect(`/urls/${shortURL}`);
+
+  const userId = req.cookies.user_id;
+  const user = users[userId];
+
+  if (userId !== urlDatabase[shortURL].userID) {
+    return res.send('Unauthorized access');
+  }
+
 });
 
 // Add an endpoint to handle a POST to /login in your Express server.
