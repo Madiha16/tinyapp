@@ -77,6 +77,12 @@ app.get("/urls/new", (req, res) => {
 
   const user = users[req.cookies.user_id];
 
+  // If someone is not logged in when trying to access /urls/new , redirect them to the login page.
+  if (!user) {
+    return res.redirect("/login");
+    // return res.status(401).send("Login to continue!");
+  }
+
   const templateVars = {
     user,
     urls: urlDatabase };
@@ -118,10 +124,20 @@ app.get("/login", (req, res) => {
 // Note that it's been parsed into a JS object, where "longURL" is the key
 // we specified this key using the "input" attribute "name"
 app.post("/urls", (req, res) => {
+
+  // cookie lives in browser, use it to check if a user is logged in
+  const user = users[req.cookies.user_id];
+
+  // Ensure that a none logged in user cannot add a new url with a POST request to /urls.
+  // The app should return a relevant error message instead.
+  if (!user) {
+    return res.status(401).send("Login to continue!");
+    // return res.redirect("/login");
+  }
+
   // console.log(req.body);  // Log the POST request body to the console
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
-  // console.log("shortURL::", shortURL, "req.body.longURL::", req.body.longURL);  // Log the POST request body to the console
   res.redirect(`/urls/${shortURL}`);
 });
 
