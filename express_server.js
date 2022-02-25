@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 // const cookieParser = require('cookie-parser');
 const bcrypt = require("bcryptjs");
 const cookieSession = require("cookie-session");
+const getUserByEmail = require("./helpers");
 
 //--------------------------------------------- MIDDLEWARE -------------------------------------------------
 app.use(bodyParser.urlencoded({extended: true}));
@@ -49,16 +50,6 @@ const users = {
 //-------------------------------------------- HELPER FUNCTION ---------------------------------------------
 // Helper func to generate a random string
 const generateRandomString = () => Math.random().toString(36).substr(2, 6);
-
-// Helper func to check if email is in "users" database
-const getUserByEmail = function(email, users) {
-  for (const user in users) {
-    if (email === users[user].email) {
-      return users[user];
-    }
-  }
-  return null;
-};
 
 const urlsForUser = function(id, urlDatabase) {
   let userURLS = {};
@@ -299,7 +290,7 @@ app.post("/register", (req, res) => {
   // Checking for an email in the users object is something we'll need to do
   // in other routes as well. Consider creating an email lookup helper function to keep your code DRY
 
-  // if checkEail is true, means the email exists in users -> don't allow registration
+  // if getUserByEmail is true, means the email exists in users -> don't allow registration
   if (getUserByEmail(email, users)) {
     return res.status(400).send("Email is already registered");
     // include link to go back and try again, or to go to log in page??
