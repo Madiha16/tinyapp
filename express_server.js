@@ -188,6 +188,14 @@ app.post("/urls", (req, res) => {
 // After the resource has been deleted, redirect the client back to the urls_index page ("/urls").
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
+
+  const userId = req.cookies.user_id;
+  const user = users[userId];
+
+  if (userId !== urlDatabase[shortURL].userID) {
+    return res.send('Unauthorized access');
+  }
+  
   delete urlDatabase[shortURL];
   res.redirect("/urls");
 });
