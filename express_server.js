@@ -108,10 +108,11 @@ app.get("/urls/new", (req, res) => {
 
 // Redirect any request to "/u/:shortURL" to its longURL
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL].longURL;
   // URL Shortening (Part 2)
   // What would happen if a client requests a non-existent shortURL?
-  if (!urlDatabase[req.params.shortURL]) {
+  if (!longURL) {
     res.send("This URL does not exist.");
   }
   res.redirect(longURL);
