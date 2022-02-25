@@ -313,9 +313,14 @@ app.get("/urls/:shortURL", (req, res) => {
   }
   // or if the URL with the matching :id does not belong to them
 
-  const urls = urlsForUser(userId, urlDatabase);
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL].longURL;
+
+  // const urls = urlsForUser(userId, urlDatabase);
+
+  if (userId !== urlDatabase[shortURL].userID) {
+    return res.send('Unauthorized access');
+  }
 
   const templateVars = {
     user,
