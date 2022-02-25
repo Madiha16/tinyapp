@@ -195,9 +195,11 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   if (userId !== urlDatabase[shortURL].userID) {
     return res.send('Unauthorized access');
   }
-  
+
   delete urlDatabase[shortURL];
   res.redirect("/urls");
+  // check using curl
+  // curl -X POST -i localhost:8080/urls/i3BoGr/delete
 });
 
 // Add a POST route that updates a URL resource; POST /urls/:id
