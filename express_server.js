@@ -12,12 +12,16 @@ app.set("view engine", "ejs");
 //--------------------------------------------- DATABASE -------------------------------------------------
 const urlDatabase = {
   b6UTxQ: {
-      longURL: "https://www.tsn.ca",
-      userID: "aa"
+    longURL: "https://www.tsn.ca",
+    userID: "aa"
   },
   i3BoGr: {
-      longURL: "https://www.google.ca",
-      userID: "aa"
+    longURL: "https://www.google.ca",
+    userID: "aa"
+  },
+  h4L110: {
+    longURL: "https://www.google.ca",
+    userID: "bb"
   }
 };
 
@@ -50,7 +54,7 @@ const getUserByEmail = function(email) {
   return false;
 };
 
-const getURLS = function(id, urlDatabase) {
+const urlsForUser = function(id, urlDatabase) {
   let userURLS = {};
   for (const url in urlDatabase) {
     if (urlDatabase[url].userID === id) {
@@ -73,7 +77,7 @@ app.get("/urls", (req, res) => {
   // same as:
   const userId = req.cookies.user_id;
   const user = users[userId];
-  const urls = getURLS(userId, urlDatabase);
+  const urls = urlsForUser(userId, urlDatabase);
   // console.log("urls:", urls);
 
   // Return HTML with a relevant error message if the user is not logged in.
