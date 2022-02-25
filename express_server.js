@@ -144,6 +144,12 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/register", (req, res) => {
   const user = users[req.session.user_id];
   const templateVars = { user };
+
+  // if user logged in redirect to /urls
+  if (user) {
+    res.redirect("/urls");
+  }
+  
   res.render("register", templateVars);
 });
 
@@ -152,10 +158,10 @@ app.get("/login", (req, res) => {
   const user = users[req.session.user_id];
   const templateVars = { user };
 
-  // // if user logged in redirect to /urls
-  // if (user) {
-  //   res.redirect("/urls");
-  // }
+  // if user logged in redirect to /urls
+  if (user) {
+    res.redirect("/urls");
+  }
 
   res.render("login", templateVars);
 });
