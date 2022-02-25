@@ -261,7 +261,8 @@ app.post("/login", (req, res) => {
 // and redirects the user back to the /urls page.
 // mentor suggested to redirect to /login... makes sense
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+  // res.clearCookie("user_id");
+  req.session = null;
   // only have to pass in the string of the key name, not the value!
   // mentor suggested to redirect to /login... makes sense
   res.redirect("/login");
