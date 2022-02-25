@@ -303,7 +303,17 @@ app.post("/register", (req, res) => {
 // should be ordered from most specific to least specific.
 app.get("/urls/:shortURL", (req, res) => {
 
-  const user = users[req.cookies.user_id];
+  const userId = req.cookies.user_id;
+  const user = users[userId];
+
+  // urls/:id page should display a message or prompt if the user is not logged in
+  if (!user) {
+    return res.send('Please login to continue!');
+    // ## include a link to login page?
+  }
+  // or if the URL with the matching :id does not belong to them
+
+  const urls = urlsForUser(userId, urlDatabase);
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL].longURL;
 
