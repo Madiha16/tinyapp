@@ -69,10 +69,20 @@ app.get("/", (req, res) => {
 // URLS index
 app.get("/urls", (req, res) => {
 
+  // const user = users[req.cookies.user_id];
+  // same as:
   const userId = req.cookies.user_id;
   const user = users[userId];
   const urls = getURLS(userId, urlDatabase);
-  console.log("urls:", urls);
+  // console.log("urls:", urls);
+
+  // Return HTML with a relevant error message if the user is not logged in.
+  if (!user) {
+    return res.send('Please login to continue!');
+    // ## include a link to login page?
+    // return res.redirect("/login");
+    // return res.status(401).send("Login to continue!");
+  }
 
   const templateVars = {
     user,
