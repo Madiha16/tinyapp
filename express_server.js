@@ -109,12 +109,14 @@ app.get("/urls/new", (req, res) => {
 // Redirect any request to "/u/:shortURL" to its longURL
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL].longURL;
+  // console.log("shortURL:", shortURL, "longURL:", longURL, "urlDatabase[shortURL]:,", urlDatabase[shortURL]);
   // URL Shortening (Part 2)
   // What would happen if a client requests a non-existent shortURL?
-  if (!longURL) {
+  if (urlDatabase[shortURL] === undefined) {
     res.send("This URL does not exist.");
   }
+  const longURL = urlDatabase[shortURL].longURL;
+
   res.redirect(longURL);
 
 });
@@ -156,13 +158,15 @@ app.post("/urls", (req, res) => {
   // console.log(req.body);  // Log the POST request body to the console
   const shortURL = generateRandomString();
 
+  const longURL = req.body.longURL;
+
   // const userURL = {
   //   longURL: req.body.longURL,
   //   userID: req.cookies.user_id
   // };
   // urlDatabase[shortURL] = userURL;
   // same thing as:
-  urlDatabase[shortURL] = {longURL: req.body.longURL, userID: req.cookies.user_id};
+  urlDatabase[shortURL] = {longURL, userID: req.cookies.user_id};
   res.redirect(`/urls/${shortURL}`);
 });
 
