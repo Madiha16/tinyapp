@@ -273,7 +273,7 @@ app.post("/logout", (req, res) => {
   req.session = null;
   // only have to pass in the string of the key name, not the value!
   // mentor suggested to redirect to /login... makes sense
-  res.redirect("/login");
+  res.redirect("/urls");
 });
 
 // This endpoint should add a new user object to the global users object.
