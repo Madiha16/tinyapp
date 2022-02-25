@@ -295,10 +295,13 @@ app.post("/register", (req, res) => {
     // include link to go back and try again, or to go to log in page??
   }
 
+  // const salt = bcrypt.genSaltSync();
+  const hashedPassword = bcrypt.hashSync(password, 10);
+
   users[id] = {
     id,
     email,
-    password
+    password: hashedPassword
   };
 
   res.cookie("user_id", id);
