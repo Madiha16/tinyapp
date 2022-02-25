@@ -243,9 +243,11 @@ app.post("/login", (req, res) => {
     // include link to go back? try again?
   }
 
+  const result = bcrypt.compareSync(password, user.password);
+
   // 2. If a user with that e-mail address is located, compare the password given in the form with
   // the existing user's password. If it does not match, return a response with a 403 status code.
-  if (password !== user.password) {
+  if (!result) {
     return res.status(403).send("Invalid login credentials");
     // include link to go back? try again?
   }
