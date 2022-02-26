@@ -78,7 +78,6 @@ app.get("/urls", (req, res) => {
 
   // Return HTML with a relevant error message if the user is not logged in.
   if (!user) {
-    // return res.send('Please login to continue!');
     return res.status(401).send("Please <a href='/login'> login </a> or <a href='/register'> register </a> to continue!");
   }
 
@@ -150,7 +149,7 @@ app.post("/urls", (req, res) => {
   // Ensure that a non-logged in user cannot add a new url with a POST request to /urls.
   // The app should return a relevant error message instead.
   if (!user) {
-    return res.status(401).send("<a href='/login'> Login</a> to continue!");
+    return res.status(401).send("Login to continue");
   }
 
   const shortURL = generateRandomString();
@@ -177,11 +176,9 @@ app.post("/urls/:shortURL/", (req, res) => {
 
   // urls/:id page should display a message or prompt if the user is not logged in
   if (!userId) {
-    
     return res.send("Login to continue");
   }
 
-  // ##can "userId" be delcared as "userID" even though that's a key name in URLDatabase already?
   if (userId !== urlDatabase[shortURL].userID) {
     return res.status(400).send("Unauthorized");
   }
