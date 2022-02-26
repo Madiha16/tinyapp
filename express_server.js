@@ -5,7 +5,7 @@ const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const bcrypt = require("bcryptjs");
 const cookieSession = require("cookie-session");
-const getUserByEmail = require("./helpers");
+const { getUserByEmail } = require("./helpers");
 
 //--------------------------------------------- MIDDLEWARE -------------------------------------------------
 app.use(bodyParser.urlencoded({extended: true}));
@@ -78,7 +78,8 @@ app.get("/urls", (req, res) => {
 
   // Return HTML with a relevant error message if the user is not logged in.
   if (!user) {
-    return res.send('Please login to continue!');
+    // return res.send('Please login to continue!');
+    return res.status(401).send("Please <a href='/login'> login </a> or <a href='/register'> register </a> to continue!");
   }
 
   const templateVars = {
@@ -149,7 +150,7 @@ app.post("/urls", (req, res) => {
   // Ensure that a non-logged in user cannot add a new url with a POST request to /urls.
   // The app should return a relevant error message instead.
   if (!user) {
-    return res.status(401).send("Login to continue!");
+    return res.status(401).send("<a href='/login'> Login</a> to continue!");
   }
 
   const shortURL = generateRandomString();
@@ -161,7 +162,6 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
   const userId = req.session.user_id;
-  // const user = users[userId];
 
   if (userId !== urlDatabase[shortURL].userID) {
     return res.send('Unauthorized access');
@@ -176,10 +176,9 @@ app.post("/urls/:shortURL/", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 
   const userId = req.session.user_id;
-  // const user = users[userId];
 
   if (userId !== urlDatabase[shortURL].userID) {
-    return res.send('Unauthorized access');
+    return res.send("Unauthorized access. <a href='/login'> Login </a> or <a href='/register'> register </a> to continue.");
   }
 
 });
@@ -189,21 +188,21 @@ app.post("/login", (req, res) => {
   const password = req.body.password;
   
   if (!email || !password) {
-    return res.status(400).send("ERROR: Missing login information!");
+    return res.status(400).send("Missing login credentials. <a href='/login'> Click to go back </a>");
   }
   
   const user = getUserByEmail(email, users);
 
   // If a user with that e-mail cannot be found, return a response with a 403 status code.
   if (!user) {
-    return res.status(403).send("This email is not registered");
+    return res.status(403).send("Email not found. Go back to <a href='/login'> Login</a> or <a href='/register'> Register</a> another email.");
   }
 
   const result = bcrypt.compareSync(password, user.password);
 
   // If password does not match, return a response with a 403 status code.
   if (!result) {
-    return res.status(403).send("Invalid login credentials");
+    return res.status(403).send("Invalid login credentials. <a href='/login'> Click to go back. </a>");
   }
 
   req.session.user_id = user.id;
@@ -222,11 +221,11 @@ app.post("/register", (req, res) => {
   const password = req.body.password;
 
   if (!email || !password) {
-    return res.status(400).send("ERROR: Missing email and/or password");
+    return res.status(400).send("ERROR: Missing login information. <a href='/register'> Click to go back. </a>");
   }
 
   if (getUserByEmail(email, users)) {
-    return res.status(400).send("Email is already registered");
+    return res.status(400).send("Email is already registered. <a href='/register'> Click to go back. </a>");
   }
 
   const hashedPassword = bcrypt.hashSync(password, 10);
@@ -250,7 +249,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
   // urls/:id page should display a message or prompt if the user is not logged in
   if (!user) {
-    return res.send('Please login to continue!');
+    return res.send('Please click <a href="/login"> Login</a> to continue!');
   }
 
   const shortURL = req.params.shortURL;
