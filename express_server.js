@@ -38,7 +38,7 @@ const users = {
     email: "a@a",
     password: "$2a$10$O6a3j/1KBeXwxRMGXtWFQ.tnDZEMwzp0NxI1rfH8C0eLT7d1sfc6C"
   },
- "bb": {
+  "bb": {
     id: "bb",
     email: "b@b",
     password: "$2a$10$5BW3UBhoNgDaq5OWgntdEeagJ8bQotNxRH3ZhiT9b.vXDlV1M1qJe"
@@ -161,7 +161,7 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
   const userId = req.session.user_id;
-  const user = users[userId];
+  // const user = users[userId];
 
   if (userId !== urlDatabase[shortURL].userID) {
     return res.send('Unauthorized access');
@@ -176,7 +176,7 @@ app.post("/urls/:shortURL/", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 
   const userId = req.session.user_id;
-  const user = users[userId];
+  // const user = users[userId];
 
   if (userId !== urlDatabase[shortURL].userID) {
     return res.send('Unauthorized access');
