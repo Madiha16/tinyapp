@@ -172,15 +172,21 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 app.post("/urls/:shortURL/", (req, res) => {
-  const shortURL = req.params.shortURL;
-  res.redirect(`/urls/${shortURL}`);
-
   const userId = req.session.user_id;
+  const shortURL = req.params.shortURL;
 
-  if (userId !== urlDatabase[shortURL].userID) {
-    return res.send("Unauthorized access. <a href='/login'> Login </a> or <a href='/register'> register </a> to continue.");
+  // urls/:id page should display a message or prompt if the user is not logged in
+  if (!userId) {
+    
+    return res.send("Login to continue");
   }
 
+  // ##can "userId" be delcared as "userID" even though that's a key name in URLDatabase already?
+  if (userId !== urlDatabase[shortURL].userID) {
+    return res.status(400).send("Unauthorized");
+  }
+
+  res.redirect(`/urls/${shortURL}`);
 });
 
 app.post("/login", (req, res) => {
@@ -249,6 +255,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
   // urls/:id page should display a message or prompt if the user is not logged in
   if (!user) {
+    
     return res.send('Please click <a href="/login"> Login</a> to continue!');
   }
 
