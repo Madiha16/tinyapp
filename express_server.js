@@ -103,13 +103,11 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-
   const userId = req.session.user_id;
   const user = users[userId];
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL].longURL;
 
-  // urls/:id page should display a message or prompt if the user is not logged in
   if (!user) {
     return res.send('Please click <a href="/login"> Login</a> to continue!');
   }
@@ -161,16 +159,16 @@ app.get("/login", (req, res) => {
 //---------------------------------------------- POST ROUTES -----------------------------------------------
 
 app.post("/urls", (req, res) => {
-  const user = users[req.session.user_id];
+  const userID = req.session.user_id;
 
-  if (!user) {
+  if (!userID) {
     return res.status(401).send("Login to continue");
   }
 
-  const shortURL = generateRandomString();
   const longURL = req.body.longURL;
-  urlDatabase[shortURL] = { longURL, userID: req.session.user_id };
-  res.redirect(`/urls/${shortURL}`);
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = { longURL, userID };
+  res.redirect("/urls");
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
