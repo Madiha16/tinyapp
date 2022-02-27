@@ -45,7 +45,7 @@ const users = {
   }
 };
 
-//-------------------------------------------- HELPER FUNCTION ---------------------------------------------
+//-------------------------------------------- HELPER FUNCTIONS ---------------------------------------------
 const generateRandomString = () => Math.random().toString(36).substr(2, 6);
 
 const urlsForUser = function(id, urlDatabase) {
@@ -63,7 +63,6 @@ app.get("/", (req, res) => {
   const userId = req.session.user_id;
   const user = users[userId];
 
-  // If user is not logged in: (Minor) redirect to /login
   if (!user) {
     return res.redirect("/login");
   }
@@ -76,7 +75,6 @@ app.get("/urls", (req, res) => {
   const user = users[userId];
   const urls = urlsForUser(userId, urlDatabase);
 
-  // Return HTML with a relevant error message if the user is not logged in.
   if (!user) {
     return res.status(401).send("Please <a href='/login'> login </a> or <a href='/register'> register </a> to continue!");
   }
@@ -96,7 +94,6 @@ app.get("/urls.json", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const user = users[req.session.user_id];
 
-  // If someone is not logged in when trying to access /urls/new, redirect them to the login page
   if (!user) {
     return res.redirect("/login");
   }
@@ -108,7 +105,6 @@ app.get("/urls/new", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
 
-  // If URL for the given ID does not exist (Minor) returns HTML with a relevant error message
   if (urlDatabase[shortURL] === undefined) {
     res.send("This URL does not exist.");
   }
@@ -121,7 +117,6 @@ app.get("/register", (req, res) => {
   const user = users[req.session.user_id];
   const templateVars = { user };
 
-  // If user is logged in redirect to /urls
   if (user) {
     res.redirect("/urls");
   }
@@ -133,7 +128,6 @@ app.get("/login", (req, res) => {
   const user = users[req.session.user_id];
   const templateVars = { user };
 
-  // If user is logged in, redirect to /urls
   if (user) {
     res.redirect("/urls");
   }
@@ -146,8 +140,6 @@ app.get("/login", (req, res) => {
 app.post("/urls", (req, res) => {
   const user = users[req.session.user_id];
 
-  // Ensure that a non-logged in user cannot add a new url with a POST request to /urls.
-  // The app should return a relevant error message instead.
   if (!user) {
     return res.status(401).send("Login to continue");
   }
@@ -174,7 +166,6 @@ app.post("/urls/:shortURL/", (req, res) => {
   const userId = req.session.user_id;
   const shortURL = req.params.shortURL;
 
-  // urls/:id page should display a message or prompt if the user is not logged in
   if (!userId) {
     return res.send("Login to continue");
   }
@@ -189,21 +180,15 @@ app.post("/urls/:shortURL/", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  
+  const user = getUserByEmail(email, users);
+  const result = bcrypt.compareSync(password, user.password);
+
   if (!email || !password) {
     return res.status(400).send("Missing login credentials. <a href='/login'> Click to go back </a>");
   }
-  
-  const user = getUserByEmail(email, users);
-
-  // If a user with that e-mail cannot be found, return a response with a 403 status code.
   if (!user) {
     return res.status(403).send("Email not found. Go back to <a href='/login'> Login</a> or <a href='/register'> Register</a> another email.");
   }
-
-  const result = bcrypt.compareSync(password, user.password);
-
-  // If password does not match, return a response with a 403 status code.
   if (!result) {
     return res.status(403).send("Invalid login credentials. <a href='/login'> Click to go back. </a>");
   }
@@ -214,7 +199,6 @@ app.post("/login", (req, res) => {
 
 app.post("/logout", (req, res) => {
   req.session = null;
-  // Redirect the user back to the /urls page
   res.redirect("/urls");
 });
 
@@ -226,7 +210,6 @@ app.post("/register", (req, res) => {
   if (!email || !password) {
     return res.status(400).send("ERROR: Missing login information. <a href='/register'> Click to go back. </a>");
   }
-
   if (getUserByEmail(email, users)) {
     return res.status(400).send("Email is already registered. <a href='/register'> Click to go back. </a>");
   }
@@ -249,16 +232,13 @@ app.get("/urls/:shortURL", (req, res) => {
 
   const userId = req.session.user_id;
   const user = users[userId];
-
-  // urls/:id page should display a message or prompt if the user is not logged in
-  if (!user) {
-    
-    return res.send('Please click <a href="/login"> Login</a> to continue!');
-  }
-
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL].longURL;
 
+  // urls/:id page should display a message or prompt if the user is not logged in
+  if (!user) {
+    return res.send('Please click <a href="/login"> Login</a> to continue!');
+  }
   if (userId !== urlDatabase[shortURL].userID) {
     return res.send('Unauthorized access');
   }
@@ -268,7 +248,6 @@ app.get("/urls/:shortURL", (req, res) => {
     shortURL,
     longURL
   };
-  
   res.render("urls_show", templateVars);
 });
 
