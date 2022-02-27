@@ -37,10 +37,6 @@ app.get("/urls", (req, res) => {
     urls: userURLS
   };
 
-  // if user is not logged in: returns HTML with a relevant error message
-  // POSSIBLE CONFLICTING DIRECTIONS FROM Compass
-  //if a user is not logged in, the header shows: a link to the login page (/login)
-  // a link to the registration page (/register)
   if (!user) {
     return res.status(401).send("Please <a href='/login'> login </a> or <a href='/register'> register </a> to continue!");
   }
