@@ -76,7 +76,7 @@ app.get("/urls/:shortURL", (req, res) => {
     return res.status(404).send("Page not found. <a href='/urls'> Go back to main page.</a>");
   }
   if (userId !== urlDatabase[shortURL].userID) {
-    return res.send('Unauthorized access');
+    return res.send("Unauthorized access. <a href='/urls'> Go back to main page.</a>");
   }
 
   const longURL = urlDatabase[shortURL].longURL;
@@ -90,12 +90,12 @@ app.get("/urls/:shortURL", (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL].longURL;
 
   if (urlDatabase[shortURL] === undefined) {
-    res.send("This URL does not exist.");
+    res.send("Long URL does not exist. <a href='/urls'> Go back to main page.</a>");
   }
-
+  
+  const longURL = urlDatabase[shortURL].longURL;
   res.redirect(longURL);
 });
 
@@ -133,7 +133,7 @@ app.post("/urls", (req, res) => {
   }
 
   urlDatabase[shortURL] = { longURL, userID };
-  res.redirect("/urls");
+  res.redirect(`/urls/${shortURL}`);
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
