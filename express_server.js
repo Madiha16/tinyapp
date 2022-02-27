@@ -61,9 +61,8 @@ const urlsForUser = function(id, urlDatabase) {
 //--------------------------------------------- GET ROUTES -------------------------------------------------
 app.get("/", (req, res) => {
   const userId = req.session.user_id;
-  const user = users[userId];
 
-  if (!user) {
+  if (!userId) {
     return res.redirect("/login");
   }
 
@@ -193,17 +192,17 @@ app.post("/urls/:shortURL/", (req, res) => {
   if (userId !== urlDatabase[shortURL].userID) {
     return res.status(400).send("Unauthorized");
   }
-  
+
   const newURL = req.body.longURL;
   urlDatabase[shortURL].longURL = newURL;
-  res.redirect(`/urls/${shortURL}`);
+  res.redirect("/urls");
 });
 
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const user = getUserByEmail(email, users);
-  const result = bcrypt.compareSync(password, user.password);
+  const passwordsMatch = bcrypt.compareSync(password, user.password);
 
   if (!email || !password) {
     return res.status(400).send("Missing login credentials. <a href='/login'> Click to go back </a>");
@@ -211,7 +210,7 @@ app.post("/login", (req, res) => {
   if (!user) {
     return res.status(403).send("Email not found. Go back to <a href='/login'> Login</a> or <a href='/register'> Register</a> another email.");
   }
-  if (!result) {
+  if (!passwordsMatch) {
     return res.status(403).send("Invalid login credentials. <a href='/login'> Click to go back. </a>");
   }
 
