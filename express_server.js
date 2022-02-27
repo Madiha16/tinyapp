@@ -17,11 +17,6 @@ app.use(cookieSession({
 
 app.set("view engine", "ejs");
 
-//--------------------------------------------- DATABASE -------------------------------------------------
-
-
-
-
 //--------------------------------------------- GET ROUTES -------------------------------------------------
 app.get("/", (req, res) => {
   const userId = req.session.user_id;
@@ -37,15 +32,14 @@ app.get("/urls", (req, res) => {
   const userId = req.session.user_id;
   const user = users[userId];
   const urls = urlsForUser(userId, urlDatabase);
-
-  if (!user) {
-    return res.status(401).send("Please <a href='/login'> login </a> or <a href='/register'> register </a> to continue!");
-  }
-
   const templateVars = {
     user,
     urls
   };
+
+  if (!user) {
+    return res.status(401).send("Please <a href='/login'> login </a> or <a href='/register'> register </a> to continue!");
+  }
 
   res.render("urls_index", templateVars);
 });
@@ -55,13 +49,14 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const user = users[req.session.user_id];
+  const userId = req.session.user_id;
+  const user = users[userId];
+  const templateVars = { user };
 
-  if (!user) {
+  if (!userId) {
     return res.redirect("/login");
   }
 
-  const templateVars = { user };
   res.render("urls_new", templateVars);
 });
 
@@ -70,30 +65,30 @@ app.get("/urls/:shortURL", (req, res) => {
   const user = users[userId];
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL].longURL;
+  const templateVars = {
+    user,
+    shortURL,
+    longURL
+  };
 
-  if (!user) {
+  if (!userId) {
     return res.send('Please click <a href="/login"> Login</a> to continue!');
   }
   if (userId !== urlDatabase[shortURL].userID) {
     return res.send('Unauthorized access');
   }
 
-  const templateVars = {
-    user,
-    shortURL,
-    longURL
-  };
   res.render("urls_show", templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL].longURL;
 
   if (urlDatabase[shortURL] === undefined) {
     res.send("This URL does not exist.");
   }
 
-  const longURL = urlDatabase[shortURL].longURL;
   res.redirect(longURL);
 });
 
@@ -123,13 +118,13 @@ app.get("/login", (req, res) => {
 
 app.post("/urls", (req, res) => {
   const userID = req.session.user_id;
+  const longURL = req.body.longURL;
+  const shortURL = generateRandomString();
 
   if (!userID) {
     return res.status(401).send("Login to continue");
   }
 
-  const longURL = req.body.longURL;
-  const shortURL = generateRandomString();
   urlDatabase[shortURL] = { longURL, userID };
   res.redirect("/urls");
 });
@@ -149,6 +144,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls/:shortURL/", (req, res) => {
   const userId = req.session.user_id;
   const shortURL = req.params.shortURL;
+  const newURL = req.body.longURL;
 
   if (!userId) {
     return res.send("Login to continue");
@@ -157,7 +153,6 @@ app.post("/urls/:shortURL/", (req, res) => {
     return res.status(400).send("Unauthorized");
   }
 
-  const newURL = req.body.longURL;
   urlDatabase[shortURL].longURL = newURL;
   res.redirect("/urls");
 });
