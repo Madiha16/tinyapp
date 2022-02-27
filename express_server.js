@@ -190,11 +190,12 @@ app.post("/urls/:shortURL/", (req, res) => {
   if (!userId) {
     return res.send("Login to continue");
   }
-
   if (userId !== urlDatabase[shortURL].userID) {
     return res.status(400).send("Unauthorized");
   }
-
+  
+  const newURL = req.body.longURL;
+  urlDatabase[shortURL].longURL = newURL;
   res.redirect(`/urls/${shortURL}`);
 });
 
