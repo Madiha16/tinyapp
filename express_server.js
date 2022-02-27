@@ -31,12 +31,16 @@ app.get("/", (req, res) => {
 app.get("/urls", (req, res) => {
   const userId = req.session.user_id;
   const user = users[userId];
-  const urls = urlsForUser(userId, urlDatabase);
+  const userURLS = urlsForUser(userId, urlDatabase);
   const templateVars = {
     user,
-    urls
+    urls: userURLS
   };
 
+  // if user is not logged in: returns HTML with a relevant error message
+  // POSSIBLE CONFLICTING DIRECTIONS FROM Compass
+  //if a user is not logged in, the header shows: a link to the login page (/login)
+  // a link to the registration page (/register)
   if (!user) {
     return res.status(401).send("Please <a href='/login'> login </a> or <a href='/register'> register </a> to continue!");
   }
@@ -64,20 +68,23 @@ app.get("/urls/:shortURL", (req, res) => {
   const userId = req.session.user_id;
   const user = users[userId];
   const shortURL = req.params.shortURL;
+
+  if (!userId) {
+    return res.send("<a href='/login'> Login</a> to continue!");
+  }
+  if (!urlDatabase[shortURL]) {
+    return res.status(404).send("Page not found. <a href='/urls'> Go back to main page.</a>");
+  }
+  if (userId !== urlDatabase[shortURL].userID) {
+    return res.send('Unauthorized access');
+  }
+
   const longURL = urlDatabase[shortURL].longURL;
   const templateVars = {
     user,
     shortURL,
     longURL
   };
-
-  if (!userId) {
-    return res.send('Please click <a href="/login"> Login</a> to continue!');
-  }
-  if (userId !== urlDatabase[shortURL].userID) {
-    return res.send('Unauthorized access');
-  }
-
   res.render("urls_show", templateVars);
 });
 
