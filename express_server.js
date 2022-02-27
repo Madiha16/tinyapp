@@ -102,6 +102,29 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
+app.get("/urls/:shortURL", (req, res) => {
+
+  const userId = req.session.user_id;
+  const user = users[userId];
+  const shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL].longURL;
+
+  // urls/:id page should display a message or prompt if the user is not logged in
+  if (!user) {
+    return res.send('Please click <a href="/login"> Login</a> to continue!');
+  }
+  if (userId !== urlDatabase[shortURL].userID) {
+    return res.send('Unauthorized access');
+  }
+
+  const templateVars = {
+    user,
+    shortURL,
+    longURL
+  };
+  res.render("urls_show", templateVars);
+});
+
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
 
@@ -224,31 +247,6 @@ app.post("/register", (req, res) => {
 
   req.session.user_id = id;
   res.redirect("/urls/");
-});
-
-//--------------------------------- GET ROUTE for /urls/:shortURL -------------------------------------------------
-
-app.get("/urls/:shortURL", (req, res) => {
-
-  const userId = req.session.user_id;
-  const user = users[userId];
-  const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL].longURL;
-
-  // urls/:id page should display a message or prompt if the user is not logged in
-  if (!user) {
-    return res.send('Please click <a href="/login"> Login</a> to continue!');
-  }
-  if (userId !== urlDatabase[shortURL].userID) {
-    return res.send('Unauthorized access');
-  }
-
-  const templateVars = {
-    user,
-    shortURL,
-    longURL
-  };
-  res.render("urls_show", templateVars);
 });
 
 //---------------------------------------------- LISTENER -------------------------------------------------
