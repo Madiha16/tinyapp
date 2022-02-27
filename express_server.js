@@ -5,7 +5,8 @@ const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const bcrypt = require("bcryptjs");
 const cookieSession = require("cookie-session");
-const { getUserByEmail } = require("./helpers");
+const { getUserByEmail, generateRandomString, urlsForUser } = require("./helpers");
+const { urlDatabase, users } = require("./database");
 
 //--------------------------------------------- MIDDLEWARE -------------------------------------------------
 app.use(bodyParser.urlencoded({extended: true}));
@@ -17,46 +18,9 @@ app.use(cookieSession({
 app.set("view engine", "ejs");
 
 //--------------------------------------------- DATABASE -------------------------------------------------
-const urlDatabase = {
-  b6UTxQ: {
-    longURL: "https://www.tsn.ca",
-    userID: "aa"
-  },
-  i3BoGr: {
-    longURL: "https://www.google.ca",
-    userID: "aa"
-  },
-  h4L110: {
-    longURL: "https://www.google.ca",
-    userID: "bb"
-  }
-};
 
-const users = {
-  "aa": {
-    id: "aa",
-    email: "a@a",
-    password: "$2a$10$O6a3j/1KBeXwxRMGXtWFQ.tnDZEMwzp0NxI1rfH8C0eLT7d1sfc6C"
-  },
-  "bb": {
-    id: "bb",
-    email: "b@b",
-    password: "$2a$10$5BW3UBhoNgDaq5OWgntdEeagJ8bQotNxRH3ZhiT9b.vXDlV1M1qJe"
-  }
-};
 
-//-------------------------------------------- HELPER FUNCTIONS ---------------------------------------------
-const generateRandomString = () => Math.random().toString(36).substr(2, 6);
 
-const urlsForUser = function(id, urlDatabase) {
-  let userURLS = {};
-  for (const url in urlDatabase) {
-    if (urlDatabase[url].userID === id) {
-      userURLS[url] = urlDatabase[url];
-    }
-  }
-  return userURLS;
-};
 
 //--------------------------------------------- GET ROUTES -------------------------------------------------
 app.get("/", (req, res) => {
@@ -201,15 +165,19 @@ app.post("/urls/:shortURL/", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const user = getUserByEmail(email, users);
-  const passwordsMatch = bcrypt.compareSync(password, user.password);
 
   if (!email || !password) {
     return res.status(400).send("Missing login credentials. <a href='/login'> Click to go back </a>");
   }
+
+  const user = getUserByEmail(email, users);
+  
   if (!user) {
     return res.status(403).send("Email not found. Go back to <a href='/login'> Login</a> or <a href='/register'> Register</a> another email.");
   }
+
+  const passwordsMatch = bcrypt.compareSync(password, user.password);
+
   if (!passwordsMatch) {
     return res.status(403).send("Invalid login credentials. <a href='/login'> Click to go back. </a>");
   }
@@ -231,7 +199,10 @@ app.post("/register", (req, res) => {
   if (!email || !password) {
     return res.status(400).send("ERROR: Missing login information. <a href='/register'> Click to go back. </a>");
   }
-  if (getUserByEmail(email, users)) {
+
+  const user = getUserByEmail(email, users);
+
+  if (user) {
     return res.status(400).send("Email is already registered. <a href='/register'> Click to go back. </a>");
   }
 

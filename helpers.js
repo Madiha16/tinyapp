@@ -8,4 +8,16 @@ const getUserByEmail = function(email, users) {
   return null;
 };
 
-module.exports = { getUserByEmail };
+const generateRandomString = () => Math.random().toString(36).substr(2, 6);
+
+const urlsForUser = function(id, urlDatabase) {
+  let userURLS = {};
+  for (const url in urlDatabase) {
+    if (urlDatabase[url].userID === id) {
+      userURLS[url] = urlDatabase[url];
+    }
+  }
+  return userURLS;
+};
+
+module.exports = { getUserByEmail, generateRandomString, urlsForUser };
